@@ -288,8 +288,8 @@ void Menu() {
     ImGui::SetNextWindowSize(ImVec2(620.0f * base_scale, 0.0f), ImGuiCond_Appearing);
     bool keep_open = true;
     if (!ImGui::Begin(
-            BbSettings::MenuText("Bloodborne - Graphics  (Insert / hold L3+R3)###bbport_settings",
-                                 "Bloodborne — настройки  (Insert / удерживать L3+R3)###bbport_settings"),
+            BbSettings::MenuText("Bloodborne - Graphics  (PgDn / hold L3+R3)###bbport_settings",
+                                 "Bloodborne — настройки  (PgDn / удерживать L3+R3)###bbport_settings"),
             &keep_open, ImGuiWindowFlags_NoCollapse)) {
         ImGui::End();
         return;
@@ -724,7 +724,7 @@ void Init(const Vulkan::Instance& instance, vk::Format format, u32 image_count) 
         return;
     }
     initialized = true;
-    std::printf("Overlay: menu ready (Insert, or hold L3+R3)\n");
+    std::printf("Overlay: menu ready (PgDn, or hold L3+R3)\n");
 }
 
 void UpdateTextInput(SDL_Window* window) {
@@ -754,8 +754,8 @@ bool HandleEvent(const SDL_Event& event) {
     case SDL_EVENT_KEY_UP: {
         const bool down = event.type == SDL_EVENT_KEY_DOWN;
         if (down && !event.key.repeat &&
-            (event.key.key == SDLK_INSERT || (is_open && event.key.key == SDLK_ESCAPE))) {
-            SetOpen(event.key.key == SDLK_INSERT ? !is_open : false);
+            (event.key.key == SDLK_PAGEDOWN || (is_open && event.key.key == SDLK_ESCAPE))) {
+            SetOpen(event.key.key == SDLK_PAGEDOWN ? !is_open : false);
             return true;
         }
         if (!is_open) {

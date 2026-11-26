@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd -- "$(dirname -- "$0")"
+if [[ -d .local-tools/prefix/usr ]]; then
+    export PATH="$PWD/.local-tools/prefix/usr/bin:$PATH"
+    export CPATH="$PWD/.local-tools/prefix/usr/include${CPATH:+:$CPATH}"
+    export LIBRARY_PATH="$PWD/.local-tools/prefix/usr/lib${LIBRARY_PATH:+:$LIBRARY_PATH}"
+    export CMAKE_PREFIX_PATH="$PWD/.local-tools/prefix/usr${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
+    export BB_LTO=${BB_LTO:-OFF}
+fi
 mkdir -p out
 if [[ -z ${CC:-} ]]; then
     CC=$(command -v cc || command -v gcc || true)
