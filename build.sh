@@ -8,6 +8,9 @@ if [[ -d .local-tools/prefix/usr ]]; then
     export CMAKE_PREFIX_PATH="$PWD/.local-tools/prefix/usr${CMAKE_PREFIX_PATH:+:$CMAKE_PREFIX_PATH}"
     export BB_LTO=${BB_LTO:-OFF}
 fi
+if [[ -z ${DLSS_SDK_ROOT:-} && -f .local-tools/dlss-sdk/include/nvsdk_ngx_helpers_dlssg_vk.h ]]; then
+    export DLSS_SDK_ROOT="$PWD/.local-tools/dlss-sdk"
+fi
 mkdir -p out
 if [[ -z ${CC:-} ]]; then
     CC=$(command -v cc || command -v gcc || true)
@@ -77,8 +80,12 @@ fi
 # RTX 40 and newer; SDK 310.7 or newer has it). Without them the DLSS upscaler and DLSS Frame
 # Generation are listed as unavailable.
 if [[ -n ${DLSS_SDK_ROOT:-} ]]; then
+    dlss_cmake_args=(-DDLSS_SDK_ROOT="$DLSS_SDK_ROOT")
+    if [[ -f .local-tools/prefix/usr/include/vulkan/vulkan.h ]]; then
+        dlss_cmake_args+=(-DVULKAN_INCLUDE="$PWD/.local-tools/prefix/usr/include")
+    fi
     cmake -S gpu/dlss_bridge -B out/dlss-bridge -G Ninja -DCMAKE_BUILD_TYPE=Release \
-        -DDLSS_SDK_ROOT="$DLSS_SDK_ROOT" >/dev/null
+        "${dlss_cmake_args[@]}" >/dev/null
     ninja -C out/dlss-bridge >/dev/null
     rm -f out/libnvidia-ngx-dlss.so.* out/libnvidia-ngx-dlssg.so.*
     cp out/dlss-bridge/libbbport_dlss.so "$DLSS_SDK_ROOT"/lib/Linux_x86_64/rel/libnvidia-ngx-dlss.so.* out/
